@@ -1,8 +1,8 @@
-# Emotional Fidelity Beyond Persona Consistency in LLM-Based User Modeling
+# Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation
 
 Code and data for the paper:
 
-> **Emotional Fidelity Beyond Persona Consistency in LLM-Based User Modeling**
+> **Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation**
 > Eliseo Bao, Anxo Pérez, Javier Parapar · *Under review*
 
 ---
