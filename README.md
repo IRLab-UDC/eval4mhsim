@@ -53,7 +53,7 @@ Users and BDI-II questionnaires come from the [eRisk](https://erisk.irlab.org/) 
 
 Of 170 eRisk users, 116 have a RedditMetis profile, 95 keep at least three training comments, and 63 have test replies.
 
-The full P and POWER personas and their BDI-II labels are available under a data use agreement (contact [eliseo.bao@udc.es](mailto:eliseo.bao@udc.es)). [`data/public_sample/`](data/public_sample/) holds three anonymized users with both personas (`personas_p.jsonl`, `personas_power.jsonl`, one `{"id", "system_prompt"}` per line) and their BDI-II answers, score and severity (`golden.jsonl`).
+The full P and POWER personas and their BDI-II labels are on Hugging Face at [irlab-udc/power](https://huggingface.co/datasets/irlab-udc/power), gated: access is approved manually after accepting the terms of use. A three-user anonymized sample is available without access request at [irlab-udc/power-sample](https://huggingface.co/datasets/irlab-udc/power-sample).
 
 ---
 
@@ -188,7 +188,7 @@ python src/e4s/emotionality/plot.py
 
 ## License
 
-Code and the public sample are released under the [MIT License](LICENSE).
+Code is released under the [MIT License](LICENSE). The persona datasets have their own terms of use on Hugging Face.
 
 ## Citation
 

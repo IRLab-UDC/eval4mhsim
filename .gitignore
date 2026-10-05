@@ -1,7 +1,6 @@
 secrets
 hf_cache/
-data/*
-!data/public_sample/
+data/
 experiments/
 logs/
 venv/
