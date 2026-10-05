@@ -20,97 +20,132 @@
 
 > Large language model (LLM)-based user simulators are usually evaluated on persona consistency and turn-level coherence. These properties do not guarantee that generated text reproduces the affective characteristics of the target population. A simulator that misrepresents emotion distributions cannot stand in for the target users, for example when generating data to evaluate depression-screening systems. We study this problem for real social media users with self-reported depression severity, whose emotional expression is a clinically relevant signal. To address it, we introduce Eval4MHSim, a multidimensional framework for evaluating persona-grounded simulation of these users. Building on Eval4Sim, the framework evaluates adherence, consistency, naturalness, and *emotionality*, a new dimension measuring alignment between real and simulated emotion distributions. We also propose **POWER** (*Persona Optimized on Writing and Emotionality Refined*), an LLM persona construction pipeline that transforms behavioral profiles and user writing samples into affectively grounded personas. We construct personas for 116 eRisk Reddit users who completed the Beck Depression Inventory (BDI-II). On 63 of them, we evaluate 27 configurations crossing persona type, in-context examples, and Gemma 3 size. Same-user in-context examples are the strongest driver of alignment with the users' real replies. Combining them with **POWER** personas yields the best overall Eval4MHSim score, with a 12B model outperforming all 27B configurations. Adding a persona, however, lowers emotionality in 17 of 18 matched comparisons. Zero-shot **POWER** personas at 4B and 12B reach near-top adherence but the lowest emotionality. We release the **P** and **POWER** personas, their BDI-II labels, and all code.
 
----
+## Quick Start
+
+Simulate a user's reply with a persona from the public sample:
+
+```python
+from datasets import load_dataset
+from vllm import LLM, SamplingParams
+
+personas = load_dataset("irlab-udc/erisk-depression-personas-sample", "personas_power", split="train")
+
+TASK = (
+    "\n\nYou are now on Reddit. Embody this person fully and write their reply to the post below. "
+    "Be authentic to their voice — casual, direct, and natural, as real Reddit comments are. "
+    "Do not explain, analyze, or be verbose. Just reply as they would."
+)
+messages = [
+    {"role": "system", "content": personas[0]["system_prompt"] + TASK},
+    {"role": "user", "content": "<text of the Reddit post>"},
+]
+
+llm = LLM("google/gemma-3-4b-it")
+output = llm.chat(messages, SamplingParams(temperature=0.7, max_tokens=512))
+print(output[0].outputs[0].text)
+```
+
+## What Is Released
+
+| Artefact | Access |
+|---|---|
+| Code (this repository) | Public, [MIT License](LICENSE) |
+| P and POWER personas with BDI-II labels, 116 users | [irlab-udc/erisk-depression-personas](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas), gated: access is approved manually after accepting the terms of use |
+| Anonymized sample, 3 users | [irlab-udc/erisk-depression-personas-sample](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas-sample), public |
+| eRisk writings and BDI-II questionnaires | From the [eRisk](https://erisk.irlab.org/) organizers, under their user agreement |
+| Reddit activity and simulated replies | Not released |
+
+Of the 170 eRisk users, 116 have a RedditMetis profile and are in the persona collection; 63 of them have test replies and are used in the paper's experiments.
+
+## Intended Use
+
+The personas and code are intended for research on user simulation and its evaluation. They must not be used to diagnose, screen or profile real people, or to identify or contact the users behind the personas. Personas are LLM-generated and may contain errors. BDI-II scores are self-reported and are not clinical diagnoses.
 
 ## Repository Structure
 
 ```
 src/
-  dataset_gathering/      # Dataset collection and preprocessing
-  persona_descriptions/   # Persona prompt construction and generation
-  persona_simulation/     # Simulation (simulate.py, vLLM-based)
+  dataset_gathering/            # Reddit activity collection and dataset construction
+  persona_descriptions/         # RedditMetis profiles and P/POWER persona construction
+  persona_simulation/           # Simulation (simulate.py, vLLM-based)
   e4s/
-    adherence/            # ColBERT-based adherence evaluation
-    consistency/          # Authorship verification (TF-IDF, PAN metrics)
-    naturalness/          # Dialogue NLI naturalness evaluation
-    emotionality/         # Ekman emotion classification and JSD scoring
-    overall/              # Aggregate score computation and tables
-  scripts/                # SLURM job scripts for each pipeline stage
+    adherence/                  # ColBERT-based adherence evaluation
+    consistency/                # Authorship verification (TF-IDF, PAN metrics)
+    naturalness/                # Dialogue NLI naturalness evaluation
+    emotionality/               # Ekman emotion classification and JSD scoring
+    emotionality_personachat/   # Emotionality against the PersonaChat reference
+    overall/                    # Aggregate scores and tables
+  scripts/                      # SLURM job scripts for each pipeline stage
 ```
-
----
-
-## Data
-
-Users and BDI-II questionnaires come from the [eRisk](https://erisk.irlab.org/) depression severity task (CLEF 2019–2021). **eRisk data is not publicly available**; access requires registration with the eRisk organizers. Comments and threads are collected with the Reddit API up to each user's last eRisk writing.
-
-Of 170 eRisk users, 116 have a RedditMetis profile, 95 keep at least three training comments, and 63 have test replies.
-
-The full P and POWER personas and their BDI-II labels are on Hugging Face at [irlab-udc/erisk-depression-personas](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas), gated: access is approved manually after accepting the terms of use. A three-user anonymized sample is available without access request at [irlab-udc/erisk-depression-personas-sample](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas-sample).
-
----
 
 ## Setup
 
-**Requirements:** Python 3.10+, CUDA-capable GPU(s), Singularity (for SLURM execution).
+**Requirements:** Python 3.10, CUDA-capable GPU(s); Singularity for the SLURM scripts.
 
 ```bash
-# 1. Configure environment variables (HF token, cache paths)
+# 1. Configure environment variables (HF token, cache paths, Reddit API credentials, container image)
 cp secrets_example secrets
-# Edit secrets with your HF_HOME path, HF_TOKEN and Reddit API credentials
 
-# 2. Create virtualenv and install dependencies
+# 2. Create a virtualenv and install dependencies
 bash src/scripts/configure_setup.sh
+playwright install chromium
+mkdir -p logs
 ```
-
-Dependencies are listed in `requirements.txt` (scikit-learn, pandas, matplotlib, ColBERT, FAISS, sentence-transformers, vLLM).
-
----
 
 ## Pipeline
 
-Steps must be run in order. Each step has a corresponding SLURM script in `src/scripts/`. For non-SLURM environments, extract the Python command from the script body.
+Steps must be run in order. GPU stages have a SLURM script in `src/scripts/`; outside SLURM, run the Python command in the script body.
 
-### 1. Dataset preparation
+### 1. eRisk inputs
+
+Place the eRisk data under `data/`:
+
+- `data/usernames`: one Reddit username per eRisk user.
+- `data/cuestionarios/`: one eRisk XML file of writings per user, named `<username>.xml`, used to set each user's cutoff date.
+
+### 2. Behavioral profiles and P personas
 
 ```bash
+python src/persona_descriptions/fetch_redditmetis.py
+python src/persona_descriptions/fetch_sources.py
+python src/persona_descriptions/build_prompts_p.py
+python src/persona_descriptions/generate_personas_p.py   # GPU
+```
+
+**P** converts each user's RedditMetis profile into a persona with Llama 3.3 70B and writes `data/personas_p.jsonl`.
+
+### 3. Reddit activity and dataset
+
+```bash
+python src/dataset_gathering/build_cutoffs.py
 python src/dataset_gathering/fetch_activity.py
 python src/dataset_gathering/build_dataset.py
 python src/dataset_gathering/clean_dataset.py
-python src/dataset_gathering/build_cutoffs.py
 ```
 
-### 2. Persona construction
+Comments and threads are collected with the Reddit API up to each user's last eRisk writing, then split per user into `data/dataset_train.jsonl` and `data/dataset_test.jsonl`.
 
-Fetch RedditMetis behavioral profiles, then build personas under each of the two strategies evaluated in the paper: **P** (direct profile-based persona) and **POWER** (generator–critic pipeline grounded in behavioral profile, writing samples, and explicit affective instructions):
+### 4. POWER personas
 
 <p align="center">
   <img src="assets/power_pipeline.png" alt="Overview of the POWER persona construction pipeline: a generator drafts a persona from user evidence, a critic scores it on behavioral accuracy, writing style, and emotionality, and feedback drives iterative refinement." width="850">
 </p>
 
 ```bash
-python src/persona_descriptions/fetch_redditmetis.py
-python src/persona_descriptions/fetch_sources.py
-
-# P: direct profile-based persona
-python src/persona_descriptions/build_prompts_p.py
-
-# POWER: generator-critic pipeline (requires GPU; SLURM: run_generate_personas_optimized.sh)
 python src/persona_descriptions/build_prompts_power.py
-python src/persona_descriptions/generate_personas_power.py
+sbatch src/scripts/run_generate_personas_optimized.sh
 ```
 
-**P** uses only the raw RedditMetis profile (via Llama 3.3 70B). **POWER** additionally conditions on up to 20 writing samples per generator iteration, runs three generator iterations with critic feedback from Phi-4 along behavioral, stylistic, and affective dimensions, and explicitly estimates the user's Ekman emotion tendencies.
+**POWER** conditions on up to 20 training writing samples per generator iteration, runs three generator iterations with critic feedback from Phi-4 on behavioral, stylistic and affective dimensions, and writes `data/personas_power.jsonl`.
 
-### 3. Simulation
+### 5. Simulation
 
-Runs all 27 configurations (3 model sizes × 3 persona settings × 3 conditioning strategies). Edit `src/scripts/run_simulation.sh` to select which scenarios to run.
+`src/scripts/run_simulation.sh` runs the 27 configurations (3 Gemma 3 sizes × 3 persona settings × 3 conditioning strategies):
 
 ```bash
-# SLURM
 sbatch src/scripts/run_simulation.sh
 
-# Direct (example: ICL-POWER with Gemma 3 12B)
+# Single configuration (ICL-POWER with Gemma 3 12B)
 python src/persona_simulation/simulate.py \
     --model google/gemma-3-12b-it \
     --persona-source optimized \
@@ -118,41 +153,22 @@ python src/persona_simulation/simulate.py \
     --persona-tag power \
     --few-shot-k 10 \
     --few-shot-source same_user
-
-# Direct (example: ZS, no persona, no examples)
-python src/persona_simulation/simulate.py \
-    --model google/gemma-3-12b-it \
-    --persona-source none \
-    --few-shot-k 0
 ```
 
-Conditioning strategies: **ZS** (zero-shot, no demonstrations), **ICL** (`--few-shot-source same_user`), **ICLR** (`--few-shot-source random_user`, a control). Simulations are written to `data/simulations/` with filenames encoding model, temperature, persona variant, and few-shot configuration.
+Persona settings: none (`--persona-source none`), **P** (`default`) and **POWER** (`optimized`). Conditioning strategies: **ZS** (`--few-shot-k 0`), **ICL** (`--few-shot-source same_user`) and **ICLR** (`--few-shot-source random_user`, a control). Simulations are written to `data/simulations/`.
 
-### 4. Evaluation
+### 6. Evaluation
 
-Run each dimension independently; results are written to `data/results/`.
+Each dimension runs independently and writes to `data/results/`:
 
 ```bash
-# Adherence (ColBERT retrieval)
-sbatch src/scripts/run_adherence.sh
-
-# Consistency (authorship verification)
-sbatch src/scripts/run_consistency.sh
-
-# Naturalness (Dialogue NLI)
-sbatch src/scripts/run_naturalness.sh
-
-# Emotionality (Ekman JSD)
-sbatch src/scripts/run_emotionality.sh
-# Direct:
-# python src/e4s/emotionality/evaluate.py \
-#     --dataset_test data/dataset_test.jsonl \
-#     --simulations_dir data/simulations \
-#     --output_dir data/results/emotionality \
-#     --neutral
+sbatch src/scripts/run_adherence.sh      # ColBERT retrieval
+sbatch src/scripts/run_consistency.sh    # Authorship verification
+sbatch src/scripts/run_naturalness.sh    # Dialogue NLI
+sbatch src/scripts/run_emotionality.sh   # Ekman emotion distributions
 ```
 
-### 5. Aggregate scores and tables
+### 7. Aggregate scores and tables
 
 Restrict the outputs to the evaluated users, then build the overall table:
 
@@ -166,23 +182,38 @@ python src/e4s/overall/table_overall.py \
     --output data/results_filtered/overall.tex
 ```
 
----
+## Emotionality Generalization (PersonaChat)
 
-## Emotionality Generalization (Eval4Sim)
-
-To reproduce the cross-domain emotionality analysis against the PersonaChat reference (three Gemma 3 and three Qwen3 sizes), run the emotionality evaluation on simulations from the original Eval4Sim experiments, placing them under `data/original_e4s/`:
+The paper also compares the emotion distributions of the original Eval4Sim simulations (Gemma 3 and Qwen3) with the PersonaChat reference. Place the PersonaChat reference at `data/original_e4s/personachat.jsonl` and the [Eval4Sim](https://github.com/IRLab-UDC/eval4sim) simulations under `data/original_e4s/simulations/`, then run:
 
 ```bash
-python src/e4s/emotionality/evaluate.py --simulations_dir data/original_e4s/simulations ...
-python src/e4s/emotionality/plot.py
+sbatch src/scripts/run_emotionality_personachat.sh
+python src/e4s/emotionality_personachat/fill_results_table.py
 ```
-
----
 
 ## License
 
 Code is released under the [MIT License](LICENSE). The persona datasets have their own terms of use on Hugging Face.
 
+## Contact
+
+Use [GitHub issues](https://github.com/IRLab-UDC/eval4mhsim/issues) for bugs and questions about the code. For dataset access and other inquiries, contact [eliseo.bao@udc.es](mailto:eliseo.bao@udc.es).
+
 ## Citation
 
-Citation will be added upon publication.
+The citation for this paper will be added upon publication. Eval4MHSim builds on Eval4Sim:
+
+```bibtex
+@inproceedings{bao2026eval4sim,
+  title     = {Eval4Sim: An Evaluation Framework for Persona Simulation},
+  author    = {Bao, Eliseo and Perez, Anxo and Parapar, Javier and Wang, Xi},
+  booktitle = {Proceedings of the 35th ACM International Conference on Information and Knowledge Management},
+  series    = {CIKM '26},
+  year      = {2026},
+  doi       = {10.1145/3799682.3840172}
+}
+```
+
+## Acknowledgements
+
+The first author acknowledges the support of the Department of Education, Science, Universities, and Vocational Training of the Xunta de Galicia (grant ED481A-2024-079). All authors affiliated with IRLab and CITIC acknowledge funding from the Ministry of Science, Innovation and Universities of the Government of Spain (projects PID2022-137061OB-C21, PID2025-167749OB-C22), as well as from the Department of Education, Science, Universities, and Vocational Training of the Xunta de Galicia (grant GRC ED431C 2025/49). CITIC, as a center accredited for excellence within the Galician University System and a member of the CIGUS Network, receives subsidies from the Department of Education, Science, Universities, and Vocational Training of the Xunta de Galicia. Additionally, CITIC is co-financed by the EU through the FEDER Galicia 2021-27 operational program (Ref. ED431G 2023/01).

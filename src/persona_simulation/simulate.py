@@ -21,7 +21,7 @@ def main():
     parser.add_argument("--input", default="data/dataset_test.jsonl")
     parser.add_argument("--train", default="data/dataset_train.jsonl")
     parser.add_argument("--persona-source", choices=["none", "default", "optimized"], default="default")
-    parser.add_argument("--personas-optimized", default="data/personas_po.jsonl")
+    parser.add_argument("--personas-optimized", default="data/personas_power.jsonl")
     parser.add_argument("--persona-tag", default=None, help="Override the persona label used in the output filename")
     parser.add_argument("--few-shot-k", type=int, default=10)
     parser.add_argument("--few-shot-source", choices=["same_user", "random_user"], default="same_user")

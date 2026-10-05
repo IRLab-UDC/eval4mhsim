@@ -2,7 +2,7 @@ import json
 import re
 from pathlib import Path
 
-PERSONAS_FILE = Path("data/personas.jsonl")
+PERSONAS_FILE = Path("data/personas_p.jsonl")
 CUESTIONARIOS_DIR = Path("data/cuestionarios")
 OUTPUT = Path("data/cutoffs.json")
 

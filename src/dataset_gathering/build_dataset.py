@@ -2,7 +2,7 @@ import json
 from pathlib import Path
 
 ACTIVITY_FILE = Path("data/reddit_activity.jsonl")
-PERSONAS_FILE = Path("data/personas.jsonl")
+PERSONAS_FILE = Path("data/personas_p.jsonl")
 OUTPUT = Path("data/dataset.jsonl")
 
 personas = {

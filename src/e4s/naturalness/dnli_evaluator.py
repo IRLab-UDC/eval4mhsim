@@ -133,7 +133,7 @@ def load_ground_truth(file_path: str) -> List[Dict]:
     return conversations
 
 
-def load_simulations(file_path: str, personas_file: str = "data/personas.jsonl") -> List[Dict]:
+def load_simulations(file_path: str, personas_file: str = "data/personas_p.jsonl") -> List[Dict]:
     persona_by_username = {}
     with open(personas_file) as f:
         for line in f:
@@ -157,14 +157,14 @@ def load_simulations(file_path: str, personas_file: str = "data/personas.jsonl")
     return conversations
 
 
-def load_file(file_path: str, personas_file: str = "data/personas.jsonl") -> List[Dict]:
+def load_file(file_path: str, personas_file: str = "data/personas_p.jsonl") -> List[Dict]:
     first = json.loads(open(file_path).readline())
     if "simulation" in first:
         return load_simulations(file_path, personas_file)
     return load_ground_truth(file_path)
 
 
-def evaluate_dataset(input_file: str, output_file: str, limit: int = None, personas_file: str = "data/personas.jsonl"):
+def evaluate_dataset(input_file: str, output_file: str, limit: int = None, personas_file: str = "data/personas_p.jsonl"):
     evaluator = DNLIEvaluator()
     conversations = load_file(input_file, personas_file)
 
@@ -221,7 +221,7 @@ if __name__ == "__main__":
     parser.add_argument("input_file", nargs="?")
     parser.add_argument("-o", "--output")
     parser.add_argument("-l", "--limit", type=int, default=None)
-    parser.add_argument("--personas", default="data/personas.jsonl")
+    parser.add_argument("--personas", default="data/personas_p.jsonl")
     parser.add_argument("--batch", action="store_true", help="Evaluate all simulations + ground truth, output to data/results/naturalness/")
     args = parser.parse_args()
 

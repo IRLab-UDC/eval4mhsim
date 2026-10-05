@@ -1,5 +1,5 @@
 #!/bin/bash
-#SBATCH --job-name="e4s-adh"
+#SBATCH --job-name="e4s-emo-orig"
 #SBATCH --cpus-per-task=4
 #SBATCH --ntasks=1
 #SBATCH --gpus-per-node=1
@@ -14,4 +14,8 @@ singularity run --disable-cache --nv \
     --pwd "$PWD" \
     $SIF \
     /bin/bash -c "src/scripts/configure_setup.sh && source venv/bin/activate && \
-        bash src/e4s/adherence/run_pipeline.sh"
+        python3 src/e4s/emotionality_personachat/evaluate.py \
+        --gt_path data/original_e4s/personachat.jsonl \
+        --simulations_dir data/original_e4s/simulations \
+        --output_dir data/original_e4s/emotionality/results \
+        --neutral"
