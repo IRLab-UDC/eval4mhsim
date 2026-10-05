@@ -1,31 +1,24 @@
-# Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation
+<h1 align="center">Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation</h1>
 
-Code and data for the paper:
+<p align="center">
+  <a href="https://orcid.org/0009-0000-8457-1115">Eliseo Bao</a>, <a href="https://orcid.org/0000-0002-0480-006X">Anxo Pérez</a>, <a href="https://orcid.org/0000-0002-5997-8252">Javier Parapar</a>
+  <br>
+  IRLab, CITIC, Universidade da Coruña, Spain
+</p>
 
-> **Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation**
-> Eliseo Bao, Anxo Pérez, Javier Parapar · *Under review*
-
----
+<p align="center">
+  <a href="https://huggingface.co/datasets/irlab-udc/erisk-depression-personas"><img alt="Dataset" src="https://img.shields.io/badge/%F0%9F%A4%97%20Dataset-erisk--depression--personas-FFD21E"></a>
+  <a href="https://huggingface.co/datasets/irlab-udc/erisk-depression-personas-sample"><img alt="Public sample" src="https://img.shields.io/badge/%F0%9F%A4%97%20Sample-erisk--depression--personas--sample-FFD21E"></a>
+  <a href="LICENSE"><img alt="License: MIT" src="https://img.shields.io/badge/License-MIT-blue.svg"></a>
+</p>
 
 <p align="center">
   <img src="assets/overview.png" alt="Overview of Eval4MHSim: a simulator conditions on real user activity to generate a simulated reply, which is compared against the corresponding real reply across four dimensions." width="850">
 </p>
 
-## Overview
+## Abstract
 
-Persona consistency and turn-level coherence do not guarantee that a simulator reproduces the affective characteristics of the population it simulates. We study this for real Reddit users with self-reported depression severity.
-
-- **Eval4MHSim** extends Eval4Sim with *emotionality*, a fourth dimension next to *adherence*, *consistency* and *naturalness*. It measures the alignment between the Ekman emotion distributions of pooled real and simulated replies through the Jensen-Shannon divergence.
-- **POWER** (*Persona Optimized on Writing and Emotionality Refined*) is a generator–critic pipeline that turns behavioral profiles and user writing samples into affectively grounded personas. It is compared with a direct profile-based persona (**P**).
-
-We build personas for 116 eRisk users who completed the BDI-II. On 63 of them (785 test replies) we evaluate 27 configurations: 3 Gemma 3 sizes × 3 persona settings (none, P, POWER) × 3 conditioning strategies (ZS, ICL, ICLR).
-
-### Key Findings
-
-- Same-user in-context examples are the strongest driver of alignment with the users' real replies.
-- POWER with same-user examples gives the best overall score (12B ICL-POWER, 0.983), and a 12B model outperforms all 27B configurations.
-- Adding a persona lowers emotionality in 17 of 18 matched comparisons.
-- Zero-shot POWER personas at 4B and 12B reach near-top adherence but the lowest emotionality.
+> Large language model (LLM)-based user simulators are usually evaluated on persona consistency and turn-level coherence. These properties do not guarantee that generated text reproduces the affective characteristics of the target population. A simulator that misrepresents emotion distributions cannot stand in for the target users, for example when generating data to evaluate depression-screening systems. We study this problem for real social media users with self-reported depression severity, whose emotional expression is a clinically relevant signal. To address it, we introduce Eval4MHSim, a multidimensional framework for evaluating persona-grounded simulation of these users. Building on Eval4Sim, the framework evaluates adherence, consistency, naturalness, and *emotionality*, a new dimension measuring alignment between real and simulated emotion distributions. We also propose **POWER** (*Persona Optimized on Writing and Emotionality Refined*), an LLM persona construction pipeline that transforms behavioral profiles and user writing samples into affectively grounded personas. We construct personas for 116 eRisk Reddit users who completed the Beck Depression Inventory (BDI-II). On 63 of them, we evaluate 27 configurations crossing persona type, in-context examples, and Gemma 3 size. Same-user in-context examples are the strongest driver of alignment with the users' real replies. Combining them with **POWER** personas yields the best overall Eval4MHSim score, with a 12B model outperforming all 27B configurations. Adding a persona, however, lowers emotionality in 17 of 18 matched comparisons. Zero-shot **POWER** personas at 4B and 12B reach near-top adherence but the lowest emotionality. We release the **P** and **POWER** personas, their BDI-II labels, and all code.
 
 ---
 
