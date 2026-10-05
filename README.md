@@ -53,7 +53,7 @@ Users and BDI-II questionnaires come from the [eRisk](https://erisk.irlab.org/) 
 
 Of 170 eRisk users, 116 have a RedditMetis profile, 95 keep at least three training comments, and 63 have test replies.
 
-The full P and POWER personas and their BDI-II labels are on Hugging Face at [irlab-udc/power](https://huggingface.co/datasets/irlab-udc/power), gated: access is approved manually after accepting the terms of use. A three-user anonymized sample is available without access request at [irlab-udc/power-sample](https://huggingface.co/datasets/irlab-udc/power-sample).
+The full P and POWER personas and their BDI-II labels are on Hugging Face at [irlab-udc/erisk-depression-personas](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas), gated: access is approved manually after accepting the terms of use. A three-user anonymized sample is available without access request at [irlab-udc/erisk-depression-personas-sample](https://huggingface.co/datasets/irlab-udc/erisk-depression-personas-sample).
 
 ---
 
