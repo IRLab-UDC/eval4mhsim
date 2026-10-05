@@ -1,6 +1,6 @@
-# Appendix
+# Supplementary Material
 
-Online appendix for *Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation*. Section letters match the references in the paper.
+Supplementary material for *Eval4MHSim: An Evaluation Framework and Persona Collection for Mental Health User Simulation*. It is not part of the paper and is provided for reference and reproducibility.
 
 - [A. Emotion Generalization](#a-emotion-generalization)
 - [B. Persona Induction and Simulation Prompt Templates](#b-persona-induction-and-simulation-prompt-templates)
@@ -13,7 +13,7 @@ To assess whether affective mismatch is specific to depression-oriented simulati
 
 All models deviate from the PersonaChat reference distribution. Scores range from 0.765 for Qwen3 30B (−23.53%) to 0.890 for Gemma 3 12B (−10.95%). Gemma 3 is comparable to Qwen3 at 4B and higher at the medium and large scales (0.890 vs. 0.769 and 0.844 vs. 0.765), which motivates its use in the main experiments. Larger models do not score higher: Gemma 3 12B outperforms both 4B and 27B, and the Qwen3 scores decrease as size increases from 4B to 30B.
 
-Compared with the Reddit results (emotionality column of Table 1 in the paper), zero-shot persona-conditioned simulation on PersonaChat can exhibit substantial affective mismatch. The best PersonaChat score (0.890) remains well below the Reddit configurations using same-user grounding, such as 12B ICL (0.993), 27B ICL (0.991) and the ICL-POWER variants (0.963–0.967). However, the Reddit configurations with comparable conditioning (zero-shot with a persona, ZS-P) also score higher than Gemma 3 on PersonaChat at every size (0.852 vs. 0.803 at 4B, 0.927 vs. 0.890 at 12B, and 0.912 vs. 0.844 at 27B). The gap is therefore not explained by the absence of same-user demonstrations alone. The two settings also differ in target distribution and task.
+Compared with the Reddit results (emotionality column of the overall results table in the paper), zero-shot persona-conditioned simulation on PersonaChat can exhibit substantial affective mismatch. The best PersonaChat score (0.890) remains well below the Reddit configurations using same-user grounding, such as 12B ICL (0.993), 27B ICL (0.991) and the ICL-POWER variants (0.963–0.967). However, the Reddit configurations with comparable conditioning (zero-shot with a persona, ZS-P) also score higher than Gemma 3 on PersonaChat at every size (0.852 vs. 0.803 at 4B, 0.927 vs. 0.890 at 12B, and 0.912 vs. 0.844 at 27B). The gap is therefore not explained by the absence of same-user demonstrations alone. The two settings also differ in target distribution and task.
 
 The distortion pattern differs from the mental health setting. In PersonaChat, the reference distribution is dominated by joy, surprise and sadness, with very little neutral affect. All six simulators place more mass on neutral affect (0.12–0.31 vs. 0.01) and far less on sadness (0.01–0.04 vs. 0.19), and five of six also under-represent surprise. This is consistent with these deviations reflecting a mismatch between the model's affective prior and the target corpus distribution, rather than a property unique to depression-oriented data. These results support evaluating emotion distributions directly in user simulation, alongside persona and coherence metrics. Whether persona conditioning or few-shot grounding can reduce this gap in non-mental health settings remains an open question.
 
