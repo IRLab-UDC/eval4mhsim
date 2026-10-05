@@ -1,0 +1,9 @@
+vllm
+scikit-learn
+matplotlib
+pandas
+pytrec_eval
+colbert-ai
+faiss-gpu-cu12
+sentence-transformers
+umap-learn

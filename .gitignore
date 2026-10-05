@@ -1,0 +1,12 @@
+secrets
+hf_cache/
+data/*
+!data/public_sample/
+experiments/
+logs/
+venv/
+.claude/
+__pycache__/
+*.pyc
+*.pyo
+paper/
