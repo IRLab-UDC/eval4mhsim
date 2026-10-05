@@ -91,29 +91,6 @@ Provide actionable instructions to match this exact vocabulary ratio.
 Do not mention usernames or platform names.
 ```
 
-Users with no training replies to a post receive the profile only, extended with its writing-style signals:
-
-```text
-=== BEHAVIORAL PROFILE ===
-Background and behavioral data extracted from a user's online activity:
-
-{profile}
-
-=== TASK ===
-Write a system prompt in second person (starting with "You are...") that an LLM will use to simulate this person writing Reddit replies. It must contain three labeled sections:
-
-## 1. Background and Persona
-Their strictly evidence-based identity, interests, and values derived from the profile. Keep it concise and grounded in the provided data.
-
-## 2. Writing Style Mechanics
-Concrete instructions for replicating their likely writing style, inferred from the writing complexity level, frequent words, and sentiment signals in the profile. Detail actionable mechanics: typical reply length, structural habits, punctuation and capitalization quirks. Avoid vague labels; give exact rules.
-
-## 3. Emotional Lexicon Baseline
-Using Ekman's 7 basic emotions (happiness, sadness, anger, fear, disgust, surprise, contempt) as buckets, establish a likely quantitative lexical baseline inferred from the sentiment distribution, polarity scores, subjectivity level, example comments, and community participation. Estimate proportional frequency for each dominant category. Identify absent or suppressed categories. Provide actionable instructions to mirror this vocabulary ratio.
-
-Do not mention usernames or platform names.
-```
-
 **POWER: critic** ([`persona_descriptions/generate_personas_power.py`](src/persona_descriptions/generate_personas_power.py)). After each generator iteration except the last, the critic evaluates the current draft against the behavioral profile and all writing samples seen up to that iteration.
 
 ```text
