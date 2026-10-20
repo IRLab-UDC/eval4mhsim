@@ -1,0 +1,11 @@
+secrets
+hf_cache/
+data/
+experiments/
+logs/
+venv/
+.claude/
+__pycache__/
+*.pyc
+*.pyo
+paper/
